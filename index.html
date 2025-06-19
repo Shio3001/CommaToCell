@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>表XMLダウンロード</title>
+  <style>
+    textarea{
+      min-width: 500px;
+      min-height: 100px;
+    }
+  </style>
+</head>
+<script type="module" src="src/index.ts"></script>
+<body>
+  <h2>カンマ区切り数列 → draw.io XML</h2>
+  <textarea type="text" id="comma_input" placeholder="例: 1,1,2,3,5,7 (開業すると複数行挿入)"></textarea></br>
+  <input type="number" id="square_size_input" placeholder="square-size/40"/>
+  <input type="number" id="font_size_input" placeholder="font-size/25"/>
+  <input type="text" id="comment_input" placeholder="data[]"/>
+  <button id="download-button">ダウンロード</button>
+</body>
+</html>

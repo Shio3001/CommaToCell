@@ -1,0 +1,26 @@
+{
+  "name": "commatocell",
+  "version": "1.0.0",
+  "description": "データ構造に関する授業の課題に関する指示（コンマで提出しない）を解決するためのWebプログラムです",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run build:live",
+    "build": "tsc -p .",
+    "build:live": "nodemon --watch src/**/*.ts --exec \"node --loader ts-node/esm src/index.ts\"",
+    "dev" : "vite"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^24.0.1",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "vite": "^6.3.5"
+  }
+}
