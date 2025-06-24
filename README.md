@@ -2,9 +2,9 @@
 データ構造に関する授業の課題に関する指示（コンマで提出しない）を解決するためのWebプログラムです
 draw.ioのxml形式に出力できます。
 
-GithubPagesで使えます
+GithubPagesで使えます</br>
 https://shio3001.github.io/CommaToCell/　
-
+</br>
 カスタマイズが必要ならforkかcloneして、自分でプログラムを変更してください！（xmlを吐き出してるだけなのでそこまで難しいものではない気がします）
 vite環境で動きます
 
