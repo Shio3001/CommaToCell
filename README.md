@@ -15,3 +15,9 @@ vite環境で動きます
 ファイル -> 次の場所からインポート -> デバイス
 
 ![image](https://github.com/user-attachments/assets/9d41bc2d-ad8d-40bd-b957-89048f20864d)
+
+ヒープモード
+
+<img width="893" height="235" alt="image" src="https://github.com/user-attachments/assets/fa381f4d-48b7-45a9-ba47-05b0471d5451" />
+
+<img width="352" height="229" alt="image" src="https://github.com/user-attachments/assets/bb4c2bd5-211c-43ee-925a-84ae8276fb88" />
