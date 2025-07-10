@@ -12,7 +12,6 @@ const buildArray = (
 ): {
   indexes: string[];
   cells: string[];
-  rv_id: number;
 } => {
   const indexes: string[] = [];
   const cells: string[] = [];
@@ -76,7 +75,6 @@ const buildArray = (
   return {
     indexes: indexes,
     cells: cells,
-    rv_id: cellId,
   };
 };
 const buildBinaryTree = (
@@ -89,7 +87,6 @@ const buildBinaryTree = (
   height: number
 ): {
   cells: string[];
-  rv_id: number;
   indexes: string[];
 } => {
   const cells: string[] = [];
@@ -129,7 +126,6 @@ const buildBinaryTree = (
 
   return {
     cells,
-    rv_id: cellId,
     indexes: [],
   };
 };
@@ -171,10 +167,9 @@ const downloadHorizontalTable = (e: MouseEvent): void => {
   </diagram>
 </mxfile>`;
 
-  const { indexes, cells, rv_id } = isBinaryTree
+  const { indexes, cells } = isBinaryTree
     ? buildBinaryTree(sequenceSize, values, baseX, width, cellId, fontSize, height)
     : buildArray(values, baseX, width, cellId, fontSize, height, yIndex, yCell, yMargin, comment);
-  cellId = rv_id;
 
   const fullXml = xmlHeader + indexes.join("\n") + "\n" + cells.join("\n") + xmlFooter;
   const blob = new Blob([fullXml], { type: "application/xml" });
