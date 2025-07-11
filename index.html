@@ -18,9 +18,12 @@
   <input type="number" id="font_size_input" placeholder="font-size/25"/>
   <input type="text" id="comment_input" placeholder="data[]"/>
   <button id="download-button">ダウンロード</button>
-  <label>
-  <input type="checkbox" id="binary_tree_mode"> ヒープ（二分木）モード
-</label>
+<label for="output_mode">出力モード：</label>
+<select id="output_mode">
+  <option value="horizontal" selected>配列構造</option>
+  <option value="heap">ヒープ（二分木）</option>
+  <option value="tree">木構造</option>
+</select>
 
 </body>
 </html>

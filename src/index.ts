@@ -1,5 +1,3 @@
-import { get } from "http";
-
 const buildArray = (
   values: string[][],
   baseX: number,
@@ -171,6 +169,91 @@ const buildBinaryTree = (
   };
 };
 
+const buildTreeFromAdjacencyList = (
+  labels: string[],
+  edgesRaw: string,
+  baseY: number,
+  width: number,
+  height: number,
+  fontSize: number,
+  cellIdStart: number
+): { cells: string[] } => {
+  const cells: string[] = [];
+  let cellId = cellIdStart;
+
+  const nodeIds: string[] = [];
+  const edges: Map<number, number[]> = new Map();
+  const parents = new Array(labels.length).fill(null);
+
+  // 隣接リスト解析
+  const edgeList = edgesRaw
+    .split(";")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  for (const entry of edgeList) {
+    const [srcStr, dstStr] = entry.split(":").map((s) => s.trim());
+    if (!srcStr || !dstStr) continue;
+    const src = parseInt(srcStr);
+    const dstList = dstStr.split(",").map((s) => parseInt(s));
+    edges.set(src, dstList);
+    dstList.forEach((dst) => (parents[dst] = src));
+  }
+
+  // ルートノード（親がいない）を探す
+  const roots = labels.map((_, i) => i).filter((i) => parents[i] === null);
+
+  // 各ノードの深さとX位置を決定
+  const nodePositions: { [id: number]: { x: number; y: number } } = {};
+  let globalX = 0;
+  const levelHeight = height + 40;
+
+  const assignPos = (id: number, depth: number) => {
+    const children = edges.get(id) || [];
+
+    if (children.length === 0) {
+      nodePositions[id] = {
+        x: globalX++ * (width + 40),
+        y: baseY + depth * levelHeight,
+      };
+    } else {
+      children.forEach((child) => assignPos(child, depth + 1));
+      const childXs = children.map((child) => nodePositions[child].x);
+      const avgX = (Math.min(...childXs) + Math.max(...childXs)) / 2;
+      nodePositions[id] = {
+        x: avgX,
+        y: baseY + depth * levelHeight,
+      };
+    }
+  };
+
+  roots.forEach((root) => assignPos(root, 0));
+
+  // ノード描画
+  labels.forEach((label, i) => {
+    const pos = nodePositions[i];
+    nodeIds[i] = cellId.toString();
+    cells.push(`
+<mxCell id="${cellId++}" value="&lt;div style=&quot;font-size:${fontSize}px;text-align:center;&quot;&gt;${label}&lt;/div&gt;"
+  style="shape=ellipse;whiteSpace=wrap;html=1;aspect=fixed;align=center;verticalAlign=middle;"
+  vertex="1" parent="1">
+  <mxGeometry x="${pos.x}" y="${pos.y}" width="${width}" height="${height}" as="geometry"/>
+</mxCell>`);
+  });
+
+  // エッジ描画
+  for (const [src, dsts] of edges.entries()) {
+    for (const dst of dsts) {
+      cells.push(`
+<mxCell id="${cellId++}" style="endArrow=block;html=1;" edge="1" parent="1" source="${nodeIds[src]}" target="${nodeIds[dst]}">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>`);
+    }
+  }
+
+  return { cells };
+};
+
 const downloadHorizontalTable = (e: MouseEvent): void => {
   const rawValues = (document.getElementById("comma_input") as HTMLInputElement).value;
   const values = rawValues.split("\n").map((r) =>
@@ -183,7 +266,7 @@ const downloadHorizontalTable = (e: MouseEvent): void => {
   const sequenceSize = Number((document.getElementById("square_size_input") as HTMLInputElement).value) || 40;
   const fontSize = Number((document.getElementById("font_size_input") as HTMLInputElement).value) || 25;
   const comment = (document.getElementById("comment_input") as HTMLInputElement).value;
-  const isBinaryTree = (document.getElementById("binary_tree_mode") as HTMLInputElement)?.checked;
+  const mode = (document.getElementById("output_mode") as HTMLInputElement)?.value || "horizontal";
 
   const baseX = 90;
   const width = sequenceSize;
@@ -208,16 +291,49 @@ const downloadHorizontalTable = (e: MouseEvent): void => {
   </diagram>
 </mxfile>`;
 
-  const { indexes, cells } = isBinaryTree
-    ? buildBinaryTree(sequenceSize, values, baseX, width, cellId, fontSize, height)
-    : buildArray(values, baseX, width, cellId, fontSize, height, yIndex, yCell, yMargin, comment);
+  const handle = (
+    mode: string
+  ): {
+    cells: string[];
+    indexes: string[];
+    filename: string;
+  } => {
+    switch (mode) {
+      case "horizontal":
+        return {
+          ...buildArray(values, baseX, width, cellId, fontSize, height, yIndex, yCell, yMargin, comment),
+          filename: "sequence.drawio.xml",
+        };
+      case "heap":
+        return {
+          ...buildBinaryTree(sequenceSize, values, baseX, width, cellId, fontSize, height),
+          filename: "heap_tree.drawio.xml",
+        };
+      case "tree":
+        const labelLine = values[0] || [];
+        const edgeLineRaw = rawValues.split("\n")[1] || "";
+        return {
+          ...buildTreeFromAdjacencyList(labelLine, edgeLineRaw, 100, sequenceSize, sequenceSize, fontSize, cellId),
+          indexes: [],
+          filename: "tree.drawio.xml",
+        };
+      default:
+        return {
+          cells: [],
+          indexes: [],
+          filename: "unknown_mode.drawio.xml",
+        };
+    }
+  };
+
+  const { indexes, cells, filename } = handle(mode);
 
   const fullXml = xmlHeader + indexes.join("\n") + "\n" + cells.join("\n") + xmlFooter;
   const blob = new Blob([fullXml], { type: "application/xml" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = isBinaryTree ? "heap_tree.drawio.xml" : "sequence.drawio.xml";
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
 };
